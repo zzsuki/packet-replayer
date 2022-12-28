@@ -12,9 +12,10 @@ from .logger import get_logger
 import click
 from .utils import DataFaker
 import logging
+import sys
+
 
 LOGGER = get_logger(__file__)
-
 BASH_PATH = os.path.dirname(__file__)
 
 
@@ -64,23 +65,27 @@ LOG_LEVEL_MAP = {
 
 
 @click.group()
-@click.option('-i', '--interface', required=True, help="发包的网卡，必填参数")
+@click.option('-i', '--interface', required=True, help="Interface to replay, like `-i` in tcpreplay, required.")
 @click.option('-l', '--level', default='info',
-              type=click.Choice(['debug', 'info', 'warning', 'error', 'critical']), help="日志等级")
+              type=click.Choice(['debug', 'info', 'warning', 'error', 'critical']), help="log level, Optional.")
 @click.option('-t', '--fast', is_flag=True, default=False, cls=MutuallyExclusiveOption,
-              mutually_exclusive=['pps', 'mbps'], help="尽可能快发送")
+              mutually_exclusive=['pps', 'mbps'], help="replay as fast as possible")
 @click.option('-p', '--pps', type=int, cls=MutuallyExclusiveOption,
-              mutually_exclusive=['fast', 'mbps'], help="包发送速率，pps单位，默认发包20s")
+              mutually_exclusive=['fast', 'mbps'], help="replay as given pps(packet per second), default replay 20s")
 @click.option('-m', '--mbps', type=float, cls=MutuallyExclusiveOption,
-              mutually_exclusive=['fast', 'pps'], help="包发送速率，mbps单位")
-@click.option('-f', '--file', required=True, callback=check_file, help="重放目标【文件或目录】")
-@click.help_option("--help", "-h", help="显示帮助信息并退出")
+              mutually_exclusive=['fast', 'pps'], help="replay as given bandwidth(units: `mbps`)")
+@click.option('-f', '--file', required=True, callback=check_file, help="file or directory to replay, when directory, replay all pcap files in it.")
+@click.help_option("--help", "-h", help="show help message and exit")
 @click.pass_context
 def cli(ctx, interface, level, fast, pps, mbps, file):
+    """
+    Packet replay tool based on tcpreplay and tcpwrite
+    Only ``pps`` can set duration by setting env ``DURATION``.
+    """
     # 检查运行权限
     if not os.getuid() == 0:
         LOGGER.error("You must run this command as root")
-        exit(-1)
+        sys.exit(-1)
 
     ctx.ensure_object(dict)
     ctx.obj['interface'] = interface
@@ -91,9 +96,10 @@ def cli(ctx, interface, level, fast, pps, mbps, file):
 
 
 @cli.command()
-@click.help_option("--help", "-h", help="显示帮助信息并退出")
+@click.help_option("--help", "-h", help="show help message and exit")
 @click.pass_context
 def replay_raw(ctx):
+    """replay pcap without any modification"""
     packet_sender = PacketSender(ctx.obj['interface'])
     packets = packet_sender.get_pcap_files(ctx.obj['file'])
     for packet in packets:
@@ -108,11 +114,12 @@ def replay_raw(ctx):
 
 
 @cli.command()
-@click.option('-s', '--src_ip', type=str, default=None, help="源ip地址")
-@click.option('-d', '--dst_ip', type=str, default=None, help="目的ip地址")
-@click.help_option("--help", "-h", help="显示帮助信息并退出")
+@click.option('-s', '--src_ip', type=str, default=None, help="src ip address")
+@click.option('-d', '--dst_ip', type=str, default=None, help="dst ip address")
+@click.help_option("--help", "-h", help="show help message and exit")
 @click.pass_context
 def replay_modified(ctx, src_ip, dst_ip):
+    """replay pcap and modify src ip and dst ip"""
     packet_sender = PacketSender(ctx.obj['interface'])
     packets = packet_sender.get_pcap_files(ctx.obj['file'])
     src_ip = DataFaker.fake_ipv4(area='private') if not src_ip else src_ip

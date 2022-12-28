@@ -48,24 +48,16 @@ class PacketSender:
         os.system(cmd)
         return self.cache_pcap
 
-    # def modify_ip(self, file, src_ip, dst_ip):
-    #     """
-    #     modify ip in pcap file
-    #     """
-    #     cmd = f'tcprewrite -e {src_ip}:{dst_ip} -c {self.tcpprep(file)} -i {file} -o {self.temp_pcap}'
-    #     os.system(cmd)
-    #     LOGGER.info(f'[+] : IP was set to {src_ip} and {dst_ip}')
-
-    #     return self.temp_pcap
-
     # -K ： use cache to send
     # -p :  packets sent per second
     # -L :  packets limit nums to send
     # -l :  loop nums of pcap_file
     # -t :  send packet as fast as tcpreplay can
 
-    def send_pps_packet(self, file, pps: int):
-        """基于pps发包"""
+    def replay_pps_packet(self, file, pps: int):
+        """
+        replay packet with pps, support set duration by env ``DURATION``
+        """
         if not os.path.exists(file):
             LOGGER.error(f'[+] pcap file {file} does not exists')
             return
@@ -77,8 +69,10 @@ class PacketSender:
         except Exception as e:
             LOGGER.error(e, exc_info=True)
 
-    def send_mbps_packet(self, file, mbps: float):
-        """基于带宽发包, 不支持设置持续时间(因为带宽无法换算为pps)"""
+    def replay_mbps_packet(self, file, mbps: float):
+        """
+        replay packet with in ``mbps``
+        """
         if not os.path.exists(file):
             LOGGER.error(f'[+] pcap file {file} does not exists')
             return
@@ -89,9 +83,9 @@ class PacketSender:
         except Exception as e:
             LOGGER.error(e, exc_info=True)
 
-    def send_topspeed_packet(self, file):
+    def replay_topspeed_packet(self, file):
         """
-        最快速度发包
+        replay packet as fast as possible
         """
         if not os.path.exists(file):
             LOGGER.error(f'[+] pcap file {file} does not exists')
@@ -106,7 +100,7 @@ class PacketSender:
 
     def modify_pcap(self, file, src_ip, dst_ip, src_mac=None, dst_mac=None):
         """
-        修改pcap文件中的ip和mac地址
+        modify ip and mac address in file
         """
         cmd = f'tcprewrite -e {src_ip}:{dst_ip} -c {self.tcpprep(file)} -i {file} -o {self.temp_pcap}'
         # gen mac expr
@@ -126,15 +120,6 @@ class PacketSender:
         os.system(cmd)
         LOGGER.info(f'[+] : IP was set to {src_ip} and {dst_ip}, MAC was set to {src_mac} and {dst_mac}')
         return self.temp_pcap
-
-    # def send_packet_in_dir(self, directory):
-    #     src_pcap_files = self.get_pcap_file(directory)
-    #     for pcap_file in src_pcap_files:
-    #         self.send_pcap_file(pcap_file, is_raw_pcap)
-
-    # def send_all_packets(self):
-    #     # send ics protocol
-    #     self.send_packet_in_dir('{}/pcaps'.format(PROJECT_PATH), is_raw_pcap)
 
     def __repr__(self):
         return f'<{self.__class__.__name__}> {self.interface}'
