@@ -1,4 +1,4 @@
-# packet_sender
+# packet-sender
 
 ## Introduction
 send packet with tcpreplay
@@ -30,7 +30,7 @@ yum install -y tcpreplay tcpwrite
 ### Install from pip
 
 ```bash
-pip install git+https://gitee.com/he_weidong/packet_sender.git
+pip install git+https://github.com/zzsuki/packet-sender.git
 ```
 
 ### Uninstall
