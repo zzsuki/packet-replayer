@@ -61,7 +61,7 @@ class PacketSender:
         if not os.path.exists(file):
             LOGGER.error(f'[+] pcap file {file} does not exists')
             return
-        DURATION = os.environ.get('DURATION', '20')
+        DURATION = int(os.environ.get('DURATION', '20'))
         cmd = f'tcpreplay -i {self.interface} -K -p {pps} -L {pps * DURATION} -l {pps * DURATION} {file}'
         try:
             os.system(cmd)
@@ -102,7 +102,6 @@ class PacketSender:
         """
         modify ip and mac address in file
         """
-        cmd = f'tcprewrite -e {src_ip}:{dst_ip} -c {self.tcpprep(file)} -i {file} -o {self.temp_pcap}'
         # gen mac expr
         if src_mac is None or dst_mac is None:
             mac_expr = ''
