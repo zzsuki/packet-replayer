@@ -28,7 +28,7 @@ class MutuallyExclusiveOption(click.Option):
         if self.mutually_exclusive:
             ex_str = ', '.join(self.mutually_exclusive)
             kwargs['help'] = _help + (
-                ' NOTE: This argument is mutually exclusive with '
+                '. NOTE: This argument is mutually exclusive with '
                 ' arguments: [' + ex_str + '].'
             )
         super().__init__(*args, **kwargs)
@@ -65,7 +65,7 @@ LOG_LEVEL_MAP = {
 
 
 @click.group()
-@click.option('-i', '--interface', required=True, help="Interface to replay, like `-i` in tcpreplay, required.")
+@click.option('-i', '--interface', required=True, help="Interface to replay, like `-i` in tcpreplay.")
 @click.option('-l', '--level', default='info',
               type=click.Choice(['debug', 'info', 'warning', 'error', 'critical']), help="log level, Optional.")
 @click.option('-t', '--fast', is_flag=True, default=False, cls=MutuallyExclusiveOption,
@@ -104,11 +104,11 @@ def replay_raw(ctx):
     packets = packet_sender.get_pcap_files(ctx.obj['file'])
     for packet in packets:
         if ctx.obj['pps'] is not None:
-            packet_sender.send_pps_packet(packet, ctx.obj['pps'])
+            packet_sender.replay_pps_packet(packet, ctx.obj['pps'])
         elif ctx.obj['mbps'] is not None:
-            packet_sender.send_mbps_packet(packet, ctx.obj['mbps'])
+            packet_sender.replay_mbps_packet(packet, ctx.obj['mbps'])
         elif ctx.obj['fast'] is not None:
-            packet_sender.send_topspeed_packet(packet)
+            packet_sender.replay_topspeed_packet(packet)
         else:
             LOGGER.error('One of [pps, mbps, fast] can must not  be None.')
 
@@ -127,11 +127,11 @@ def replay_modified(ctx, src_ip, dst_ip):
     for packet in packets:
         tmp_file = packet_sender.modify_pcap(file=packet, src_ip=src_ip, dst_ip=dst_ip)
         if ctx.obj['pps'] is not None:
-            packet_sender.send_pps_packet(tmp_file, ctx.obj['pps'])
+            packet_sender.replay_pps_packet(tmp_file, ctx.obj['pps'])
         elif ctx.obj['mbps'] is not None:
-            packet_sender.send_mbps_packet(tmp_file, ctx.obj['mbps'])
+            packet_sender.replay_mbps_packet(tmp_file, ctx.obj['mbps'])
         elif ctx.obj['fast'] is not None:
-            packet_sender.send_topspeed_packet(tmp_file)
+            packet_sender.replay_topspeed_packet(tmp_file)
         else:
             LOGGER.error('One of [pps, mbps, fast] must not given.')
 
