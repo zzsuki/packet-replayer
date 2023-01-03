@@ -46,13 +46,13 @@ def read_requirements(path):
 
 setup(
     name="packet_replay",
-    version="0.1.0",
+    version="1.0.0",
     author="zzsuki",
     author_email="zzsuki@163.com",
     maintainer="zzsuki",
     maintainer_email="zzsuki@163.com",
-    url="https://gitee.com/he_weidong/packet_sender.git",
-    download_url="https://gitee.com/he_weidong/packet_sender.git",
+    url="https://github.com/zzsuki/packet-sender.git",
+    download_url="https://github.com/zzsuki/packet-sender.git",
     license="Not open source",
     description="packet sender based on tcpreplay",
     long_description=long_description,
