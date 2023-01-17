@@ -37,5 +37,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test pip install
       run: |
-        echo "Run pip install ${{ GITHUB_REPOSITORY }}"
+        echo "Run pip install ${{ vars.GITHUB_REPOSITORY }}"
         pip install git+https://github.com/zzsuki/packet-replayer.git
