@@ -10,19 +10,19 @@ send packet with tcpreplay
 #### Debian/Ubuntu
 
 ```bash
-sudo apt install -y tcpreplay tcpwrite
+sudo apt install -y tcpreplay
 ```
 
 #### CentOS/RedHat
 
 ```bash
-yum install -y tcpreplay tcpwrite
+yum install -y tcpreplay
 ```
 
 ### Install from source
 
-1.  `git clone https://gitee.com/he_weidong/packet_sender.git`
-2.  `cd packet_sender`
+1.  `git clone https://github.com/zzsuki/packet-replayer.git`
+2.  `cd packet-replayer`
 3.  `python setup.py install --record record.txt`
 
 **make setup install record in record.txt，which will make uninstall convenient**
@@ -30,19 +30,19 @@ yum install -y tcpreplay tcpwrite
 ### Install from pip
 
 ```bash
-pip install git+https://github.com/zzsuki/packet-sender.git
+pip install git+https://github.com/zzsuki/packet-replayer.git
 ```
 
 ### Uninstall
 
 - when install by setup: `sudo python3 uninstall.py` (built-in uninstall script, which will remove all materials in record.txt)
-- when install by pip: `pip uninstall packet_sender`
+- when install by pip: `pip uninstall packet-replayer`
 
 
 ### Usage
 
 ```bash
-Usage: packet-replay [OPTIONS] COMMAND [ARGS]...
+Usage: packet-replayer [OPTIONS] COMMAND [ARGS]...
 
   Packet replay tool based on tcpreplay and tcpwrite Only ``pps`` can set
   duration by setting env ``DURATION``.
@@ -73,6 +73,6 @@ Commands:
 
 #### Example
 
-1. `packet-sender -i enp3s0 -f pcaps/s7comm.pcap -p 300  replay-modified` will replay raw pcap `pcaps/s7comm.pcap` on interface `enp3s0` at 300pps and last 20s
+1. `packet-replayer -i enp3s0 -f pcaps/s7comm.pcap -p 300  replay-raw` will replay raw pcap `pcaps/s7comm.pcap` on interface `enp3s0` at 300pps and last 20s
 
 
